@@ -82,3 +82,14 @@ class SlackBot:
         channels = json.loads(res.text)['channels']
 
         return {c['name']: c['id'] for c in channels}
+
+
+    def get_users_list(self):
+
+        base_url = 'https://slack.com/api/users.list'
+        payload = {'token': self.token}
+
+        res = self.session.get(base_url, params=payload)
+        members = json.loads(res.text)['members']
+
+        return {m['id']: m['name'] for m in members}

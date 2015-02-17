@@ -4,8 +4,15 @@
 
 import sqlite3
 import pandas as pd
+
 from SlackBot import SlackBot
 import mysetup as my
+
+import pdb
+
+
+SQLITE_DATA = './chatdata.sqlite3'
+TABLE_NAME = 'history'
 
 
 if __name__ == '__main__':
@@ -14,32 +21,28 @@ if __name__ == '__main__':
     sbot = SlackBot(my.botname, my.token)
     channels = sbot.get_channel_dict()
 
-    ## これが全部網羅できているのかよくわからない
     columns = ['type', 'subtype', 'purpose', 'channel', 'channel_id',
-               'ts', 'user', 'is_starred',  'text']
+               'ts', 'user', 'username', 'text']
 
     ## Connect to SQLite
-    con = sqlite3.connect('./chatdata.sqlite3')
+    con = sqlite3.connect(SQLITE_DATA)
     c = con.cursor()
-    table_name = 'history'
 
-    # query = ('CREATE TABLE IF NOT EXISTS ' + table_name 
-    #          + ' (' + ','.join(columns) + ') ')
-    # c.execute(query)
-
-    query = '''SELECT name FROM sqlite_master WHERE type='table' AND name='table_name';'''
+    query = ('SELECT name '
+             'FROM sqlite_master '
+             'WHERE type=\'table\' AND name=\'table_name\';')
     c.execute(query)
     res = c.fetchall()
 
     for key, item in channels.items():
+        print(key)
 
         if res:
             ## if exists db
-            ## 最新のメッセージのtsを取得する
-            query = '''
-            SELECT * FROM {0} 
-            WHERE ts = (SELECT max(ts) FROM {0}) 
-            LIMIT 1'''.format(table_name)
+            ## 最新のメッセージのtime stampxを取得する
+            query = ('SELECT * FROM {0} ' 
+                     'WHERE ts = (SELECT max(ts) FROM {0})' 
+                     'LIMIT 1').format(TABLE_NAME)
             
             ts = pd.read_sql(query, con).ts
             
@@ -54,15 +57,12 @@ if __name__ == '__main__':
         messages = sbot.get_messages(item, oldest=max_ts, count=1000)
 
         if not messages:
+            ## 新しいメッセージが無いとき
             continue
 
         df = pd.DataFrame(messages, columns=columns)
         df['channel'] = key
         df['channel_id'] = item
+        df['username'] = df.user.map(sbot.get_users_list())
 
-        print(df.head())
-
-        df.to_sql(table_name, con, if_exists='append')
-
-        break
-    
+        df.to_sql(table_name, con, if_exists='append', index=False)
