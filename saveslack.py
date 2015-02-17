@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
         if res:
             ## if exists db
-            ## 最新のメッセージのtime stampxを取得する
+            ## 最新のメッセージのtime stampを取得する
             query = ('SELECT * FROM {0} ' 
                      'WHERE ts = (SELECT max(ts) FROM {0})' 
                      'LIMIT 1').format(TABLE_NAME)

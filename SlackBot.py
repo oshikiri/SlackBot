@@ -12,6 +12,11 @@ SLEEP_TIME = 1
 
 
 class SlackBot:
+    '''Slack用bot
+
+    SlackのAPIを叩いてメッセージをpostしたり情報を取得したりする．
+    '''
+
     def __init__(self, name, token, icon_emoji=':lips:'):
         self.name = name
         self.token = token
@@ -46,7 +51,7 @@ class SlackBot:
 
 
     def post_message(self, text, channel):
-        '''チャンネルにメッセージをポストする．
+        '''チャンネルにtextをポストする．
 
         API reference:
         https://api.slack.com/methods/chat.postMessage
@@ -67,7 +72,7 @@ class SlackBot:
 
 
     def get_channel_dict(self):
-        u''' channelの名前とidを取得
+        ''' channelの名前とidを取得して，辞書にして返す
 
         API reference:
         https://api.slack.com/methods/channels.list
@@ -85,9 +90,13 @@ class SlackBot:
 
 
     def get_users_list(self):
+        '''Slackを使っているユーザーの一覧を辞書にして返す．
+        '''
 
         base_url = 'https://slack.com/api/users.list'
         payload = {'token': self.token}
+
+        time.sleep(SLEEP_TIME)
 
         res = self.session.get(base_url, params=payload)
         members = json.loads(res.text)['members']
