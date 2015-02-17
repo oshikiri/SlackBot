@@ -1,0 +1,6 @@
+*~
+*.pyc
+mysetup*
+.cache/*
+*.sqlite3
+
