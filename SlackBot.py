@@ -23,7 +23,8 @@ class SlackBot:
         self.icon_emoji = icon_emoji
         self.session = requests.session()
 
-    def get_messages(self, channel, latest=None, oldest=None, count=100):
+    def get_messages(self, channel=None, 
+                     latest=None, oldest=None, count=100):
         '''指定したチャンネルのメッセージの履歴を取得する．
 
         API reference:
