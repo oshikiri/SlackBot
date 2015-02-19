@@ -1,23 +1,39 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+__author__ = 'oshikiri'
+__email__ = 't.oshikiri.0137@gmail.com'
+__date__ = '2015-02-20'
+
 
 import requests
 import json
-import pdb
 import time
+
+import pdb
 
 
 SLEEP_TIME = 1
 
 
 class SlackBot:
-    '''Slack用bot
+    '''bot for Slack
 
     SlackのAPIを叩いてメッセージをpostしたり情報を取得したりする．
     '''
 
     def __init__(self, name, token, icon_emoji=':lips:'):
+        '''
+        Args
+        ===========
+        name : string
+            Slack上でのbotの名前
+        token : string
+            Slackのアクセストークン
+        icon_emoji : string, optional (default=':lips:')
+            Slack上でbotがアイコンとして使うemojiを指定する
+        '''
+
         self.name = name
         self.token = token
         self.icon_emoji = icon_emoji
@@ -26,6 +42,18 @@ class SlackBot:
     def get_messages(self, channel=None, 
                      latest=None, oldest=None, count=100):
         '''指定したチャンネルのメッセージの履歴を取得する．
+
+        Args
+        ===========
+        channel : string, optional (default=None) 
+            メッセージを取得したいチャンネル
+        latest : string, optional (default=None)
+            取得したいメッセージの範囲のうち，最新のtime stamp
+        oldest : string, optional (default=None)
+            取得したいメッセージの範囲のうち，最古のtime stamp
+        count : int, optional (default=100)
+            取得する件数
+            指定できる範囲は 1 <= count <= 1000
 
         API reference:
         https://api.slack.com/methods/channels.history
@@ -53,6 +81,13 @@ class SlackBot:
 
     def post_message(self, text, channel):
         '''チャンネルにtextをポストする．
+
+        Args
+        ===========
+        text : string
+            投稿したいtext
+        channel : string 
+            メッセージを投稿したいチャンネル
 
         API reference:
         https://api.slack.com/methods/chat.postMessage
