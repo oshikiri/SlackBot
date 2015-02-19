@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+__author__ = 'oshikiri'
+__email__ = 't.oshikiri.0137@gmail.com'
+__date__ = '2015-02-20'
+
 
 import sqlite3
 import pandas as pd
 
 from SlackBot import SlackBot
 import mysetup as my
-
-import pdb
 
 
 SQLITE_DATA = './chatdata.sqlite3'
@@ -39,6 +41,7 @@ if __name__ == '__main__':
 
         if res:
             ## if exists db
+
             ## 最新のメッセージのtime stampを取得する
             query = ('SELECT * FROM {0} ' 
                      'WHERE ts = (SELECT max(ts) FROM {0})' 
