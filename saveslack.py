@@ -8,6 +8,7 @@ __date__ = '2015-02-20'
 
 import sqlite3
 import pandas as pd
+import pdb
 
 from SlackBot import SlackBot
 import mysetup as my
@@ -30,22 +31,31 @@ if __name__ == '__main__':
     con = sqlite3.connect(SQLITE_DATA)
     c = con.cursor()
 
-    query = ('SELECT name '
-             'FROM sqlite_master '
-             'WHERE type=\'table\' AND name=\'table_name\';')
+    query = 'SELECT name FROM sqlite_master;'
     c.execute(query)
     res = c.fetchall()
 
     for key, item in channels.items():
         print(key)
 
-        if res:
-            ## if exists db
+        if TABLE_NAME in res[0]:
+            ## if exists `TABLE_NAME`
 
             ## 最新のメッセージのtime stampを取得する
+            ## 実際の例:
+            ##
+            ## SELECT * FROM history 
+            ## WHERE ts = (
+            ##  SELECT max(ts) FROM history WHERE channel = 'tech' 
+            ## ) 
+            ## AND channel = 'tech' LIMIT 1
+
             query = ('SELECT * FROM {0} ' 
-                     'WHERE ts = (SELECT max(ts) FROM {0})' 
-                     'LIMIT 1').format(TABLE_NAME)
+                     'WHERE ts = ('
+                     'SELECT max(ts) FROM {0} WHERE channel = \'{1}\' '
+                     ') '
+                     'AND channel = \'{1}\' '
+                     'LIMIT 1').format(TABLE_NAME, key)
             
             ts = pd.read_sql(query, con).ts
             
@@ -57,7 +67,7 @@ if __name__ == '__main__':
             ## if not exists db
             max_ts = 0
 
-        messages = sbot.get_messages(item, oldest=max_ts, count=1000)
+        messages = sbot.get_messages(channel=item, oldest=max_ts, count=1000)
 
         if not messages:
             ## 新しいメッセージが無いとき
@@ -68,4 +78,4 @@ if __name__ == '__main__':
         df['channel_id'] = item
         df['username'] = df.user.map(sbot.get_users_list())
 
-        df.to_sql(table_name, con, if_exists='append', index=False)
+        df.to_sql(TABLE_NAME, con, if_exists='append', index=False)
