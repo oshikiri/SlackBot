@@ -40,7 +40,7 @@ class SlackBot:
         self.session = requests.session()
 
         if 'SLACKTOKEN' in os.environ:
-            self.token = os.envirion['SLACKTOKEN']
+            self.token = os.environ['SLACKTOKEN']
         else:
             self.token = my.token
 
