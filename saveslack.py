@@ -11,7 +11,6 @@ import pandas as pd
 import pdb
 
 from SlackBot import SlackBot
-import mysetup as my
 
 
 SQLITE_DATA = './chatdata.sqlite3'
@@ -21,7 +20,7 @@ TABLE_NAME = 'history'
 if __name__ == '__main__':
 
     ## Connect to Slack
-    sbot = SlackBot(my.botname, my.token)
+    sbot = SlackBot('savebot')
     channels = sbot.get_channel_dict()
 
     columns = ['type', 'subtype', 'purpose', 'channel', 'channel_id',

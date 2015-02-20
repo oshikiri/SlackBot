@@ -6,9 +6,12 @@ __email__ = 't.oshikiri.0137@gmail.com'
 __date__ = '2015-02-20'
 
 
+import os
 import requests
 import json
 import time
+
+import mysetup as my
 
 import pdb
 
@@ -22,22 +25,25 @@ class SlackBot:
     SlackのAPIを叩いてメッセージをpostしたり情報を取得したりする．
     '''
 
-    def __init__(self, name, token, icon_emoji=':lips:'):
+    def __init__(self, name, icon_emoji=':lips:'):
         '''
         Args
         ===========
         name : string
             Slack上でのbotの名前
-        token : string
-            Slackのアクセストークン
         icon_emoji : string, optional (default=':lips:')
             Slack上でbotがアイコンとして使うemojiを指定する
         '''
 
         self.name = name
-        self.token = token
         self.icon_emoji = icon_emoji
         self.session = requests.session()
+
+        if 'SLACKTOKEN' in os.environ:
+            self.token = os.envirion['SLACKTOKEN']
+        else:
+            self.token = my.token
+
 
     def get_messages(self, channel=None, 
                      latest=None, oldest=None, count=100):
