@@ -3,4 +3,4 @@
 mysetup*
 .cache/*
 *.sqlite3
-
+test.py

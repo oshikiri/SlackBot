@@ -20,7 +20,7 @@ SLEEP_TIME = 1
 
 
 class SlackBot:
-    '''bot for Slack
+    '''Slack用汎用bot
 
     SlackのAPIを叩いてメッセージをpostしたり情報を取得したりする．
     '''
@@ -39,10 +39,25 @@ class SlackBot:
         self.icon_emoji = icon_emoji
         self.session = requests.session()
 
+        ## 環境変数`SLACKTOKEN`があればそれを使う
         if 'SLACKTOKEN' in os.environ:
             self.token = os.environ['SLACKTOKEN']
         else:
             self.token = my.token
+
+
+    def get_session(self, url, payload):
+        '''sleepしてから指定したurlからgetする
+        '''
+        time.sleep(SLEEP_TIME)
+        res = self.session.get(url, params=payload)
+        res_dict = json.loads(res.text)
+
+        if 'error' in res_dict:
+            print(res_dict['error'])
+            sys.exit("Error : get_session()")
+
+        return res_dict
 
 
     def get_messages(self, channel=None, 
@@ -79,10 +94,8 @@ class SlackBot:
         if oldest:
             payload['oldest'] = oldest
 
-        time.sleep(SLEEP_TIME)
-
-        res = self.session.get(base_history, params=payload)
-        return json.loads(res.text)['messages']
+        res_dict = self.get_session(base_history, params=payload)
+        return res_dict['messages']
 
 
     def post_message(self, text, channel):
@@ -123,12 +136,9 @@ class SlackBot:
         base_url = 'https://slack.com/api/channels.list'
         payload = {'token': self.token, 'exclude_archived': 1}
 
-        time.sleep(SLEEP_TIME)
+        res_dict = self.get_session(base_url, payload)
 
-        res = self.session.get(base_url, params=payload)
-        channels = json.loads(res.text)['channels']
-
-        return {c['name']: c['id'] for c in channels}
+        return {c['name']: c['id'] for c in res_dict['channels']}
 
 
     def get_users_list(self):
@@ -138,9 +148,6 @@ class SlackBot:
         base_url = 'https://slack.com/api/users.list'
         payload = {'token': self.token}
 
-        time.sleep(SLEEP_TIME)
+        res_dict = self.get_session(base_url, payload)
 
-        res = self.session.get(base_url, params=payload)
-        members = json.loads(res.text)['members']
-
-        return {m['id']: m['name'] for m in members}
+        return {m['id']: m['name'] for m in res_dict['members']}
