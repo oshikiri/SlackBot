@@ -68,13 +68,12 @@ if __name__ == '__main__':
 
         messages = sbot.get_messages(channel=item, oldest=max_ts, count=1000)
 
-        if not messages:
-            ## 新しいメッセージが無いとき
-            continue
+        if messages:
+            ## 新しいメッセージがあるとき
 
-        df = pd.DataFrame(messages, columns=columns)
-        df['channel'] = key
-        df['channel_id'] = item
-        df['username'] = df.user.map(sbot.get_users_list())
-
-        df.to_sql(TABLE_NAME, con, if_exists='append', index=False)
+            df = pd.DataFrame(messages, columns=columns)
+            df['channel'] = key
+            df['channel_id'] = item
+            df['username'] = df.user.map(sbot.get_users_list())
+        
+            df.to_sql(TABLE_NAME, con, if_exists='append', index=False)
