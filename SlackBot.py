@@ -7,6 +7,7 @@ __date__ = '2015-02-20'
 
 
 import os
+import sys
 import requests
 import json
 import time
@@ -37,7 +38,6 @@ class SlackBot:
 
         self.name = name
         self.icon_emoji = icon_emoji
-        self.session = requests.session()
 
         ## 環境変数`SLACKTOKEN`があればそれを使う
         if 'SLACKTOKEN' in os.environ:
@@ -50,7 +50,8 @@ class SlackBot:
         '''sleepしてから指定したurlからgetする
         '''
         time.sleep(SLEEP_TIME)
-        res = self.session.get(url, params=payload)
+
+        res = requests.get(url, params=payload)
         res_dict = json.loads(res.text)
 
         if 'error' in res_dict:
@@ -94,7 +95,7 @@ class SlackBot:
         if oldest:
             payload['oldest'] = oldest
 
-        res_dict = self.get_session(base_history, params=payload)
+        res_dict = self.get_session(base_history, payload)
         return res_dict['messages']
 
 
@@ -123,7 +124,7 @@ class SlackBot:
 
         time.sleep(SLEEP_TIME)
 
-        return self.session.post(base_post, data=payload)
+        return requests.post(base_post, data=payload)
 
 
     def get_channel_dict(self):
