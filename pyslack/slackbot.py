@@ -12,8 +12,6 @@ import requests
 import json
 import time
 
-import mysetup as my
-
 import pdb
 
 
@@ -26,7 +24,7 @@ class SlackBot:
     SlackのAPIを叩いてメッセージをpostしたり情報を取得したりする．
     '''
 
-    def __init__(self, name, icon_emoji=':lips:'):
+    def __init__(self, name, icon_emoji=':lips:', token=None):
         '''
         Args
         ===========
@@ -34,17 +32,19 @@ class SlackBot:
             Slack上でのbotの名前
         icon_emoji : string, optional (default=':lips:')
             Slack上でbotがアイコンとして使うemojiを指定する
+        token : string, optional (default=None)
+            Slack の API token
         '''
 
         self.name = name
         self.icon_emoji = icon_emoji
 
-        ## 環境変数`SLACKTOKEN`があればそれを使う
-        if 'SLACKTOKEN' in os.environ:
+        if token:
+            self.token = token
+        elif 'SLACKTOKEN' in os.environ:
             self.token = os.environ['SLACKTOKEN']
         else:
-            self.token = my.token
-
+            raise RuntimeError('SLACKTOKEN does not exist.')
 
     def get_session(self, url, payload):
         '''sleepしてから指定したurlからgetする
