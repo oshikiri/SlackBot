@@ -24,7 +24,7 @@ class SlackBot:
     SlackのAPIを叩いてメッセージをpostしたり情報を取得したりする．
     '''
 
-    def __init__(self, name, icon_emoji=':lips:'):
+    def __init__(self, name, icon_emoji=':lips:', token=None):
         '''
         Args
         ===========
@@ -32,12 +32,16 @@ class SlackBot:
             Slack上でのbotの名前
         icon_emoji : string, optional (default=':lips:')
             Slack上でbotがアイコンとして使うemojiを指定する
+        token : string, optional (default=None)
+            Slack の API token
         '''
 
         self.name = name
         self.icon_emoji = icon_emoji
 
-        if 'SLACKTOKEN' in os.environ:
+        if token:
+            self.token = token
+        elif 'SLACKTOKEN' in os.environ:
             self.token = os.environ['SLACKTOKEN']
         else:
             raise RuntimeError('SLACKTOKEN does not exist.')
