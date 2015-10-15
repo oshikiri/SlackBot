@@ -12,8 +12,6 @@ import requests
 import json
 import time
 
-import mysetup as my
-
 import pdb
 
 
@@ -26,7 +24,7 @@ class SlackBot:
     SlackのAPIを叩いてメッセージをpostしたり情報を取得したりする．
     '''
 
-    def __init__(self, name, icon_emoji=':lips:'):
+    def __init__(self, name, icon_emoji=':lips:', token=None):
         '''
         Args
         ===========
@@ -34,17 +32,19 @@ class SlackBot:
             Slack上でのbotの名前
         icon_emoji : string, optional (default=':lips:')
             Slack上でbotがアイコンとして使うemojiを指定する
+        token : string, optional (default=None)
+            Slack の API token
         '''
 
         self.name = name
         self.icon_emoji = icon_emoji
 
-        ## 環境変数`SLACKTOKEN`があればそれを使う
-        if 'SLACKTOKEN' in os.environ:
+        if token:
+            self.token = token
+        elif 'SLACKTOKEN' in os.environ:
             self.token = os.environ['SLACKTOKEN']
         else:
-            self.token = my.token
-
+            raise RuntimeError('SLACKTOKEN does not exist.')
 
     def get_session(self, url, payload):
         '''sleepしてから指定したurlからgetする
@@ -125,6 +125,23 @@ class SlackBot:
         time.sleep(SLEEP_TIME)
 
         return requests.post(base_post, data=payload)
+
+
+    def post_file(self, path, channels, text):
+        '''
+        API reference:
+        https://api.slack.com/methods/files.upload
+        '''
+
+        base_url = 'https://slack.com/api/files.upload'
+        payload = {
+            'token': self.token,
+            'icon_emoji': self.icon_emoji,
+            'channels': channels,
+            'initial_comment': text
+        }
+        files = {'file': open(path, 'rb')}
+        return requests.post(base_url, data=payload, files=files)
 
 
     def get_channel_dict(self):
