@@ -127,6 +127,23 @@ class SlackBot:
         return requests.post(base_post, data=payload)
 
 
+    def post_file(self, path, channels, text):
+        '''
+        API reference:
+        https://api.slack.com/methods/files.upload
+        '''
+
+        base_url = 'https://slack.com/api/files.upload'
+        payload = {
+            'token': self.token,
+            'icon_emoji': self.icon_emoji,
+            'channels': channels,
+            'initial_comment': text
+        }
+        files = {'file': open(path, 'rb')}
+        return requests.post(base_url, data=payload, files=files)
+
+
     def get_channel_dict(self):
         ''' channelの名前とidを取得して，辞書にして返す
 
