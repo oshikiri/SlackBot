@@ -12,8 +12,6 @@ import requests
 import json
 import time
 
-import mysetup as my
-
 import pdb
 
 
@@ -39,12 +37,10 @@ class SlackBot:
         self.name = name
         self.icon_emoji = icon_emoji
 
-        ## 環境変数`SLACKTOKEN`があればそれを使う
         if 'SLACKTOKEN' in os.environ:
             self.token = os.environ['SLACKTOKEN']
         else:
-            self.token = my.token
-
+            raise RuntimeError('SLACKTOKEN does not exist.')
 
     def get_session(self, url, payload):
         '''sleepしてから指定したurlからgetする
